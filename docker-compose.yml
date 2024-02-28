@@ -1,0 +1,56 @@
+version: "3.7"
+
+# WARNING !!!
+# What actually worked is using Docker run instead of compose :
+# https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#using-the-command-line
+# - docker network create app-tier --driver bridge
+
+networks:
+  kafka_network:
+    driver: bridge
+    name: kafka_network_name
+
+services:
+  kafka:
+    container_name: kafka
+    image: 'bitnami/kafka:latest'
+    networks:
+      - kafka_network
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    ports:
+      - "9094:9094"
+  create_default_topic:
+    container_name: create_default_topic
+    depends_on:
+      - kafka
+    image: 'bitnami/kafka:latest'
+    entrypoint:
+      kafka-topics.sh --create --topic temperatures --bootstrap-server kafka:9092
+    networks:
+      - kafka_network
+  temperature_producer:
+    container_name: temperature_producer
+    depends_on:
+      - kafka
+      - test_topic_create
+    build:
+      context: producer
+      dockerfile: Dockerfile
+    environment:
+      #- JAVA_OPTS=-Dbootstrap.servers=kafka:9092
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - TEMPERATURE_TOPIC_NAME=temperatures
+#      args:
+#        - PYPI_NEXUS_PULLER
+#        - PYPI_NEXUS_PULLER_PASS
+#    entrypoint:
+#      kafka-topics.sh --create --topic test_topic_1 --bootstrap-server kafka:9092
+    networks:
+      - kafka_network

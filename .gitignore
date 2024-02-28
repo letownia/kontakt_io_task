@@ -1,3 +1,10 @@
+.idea/
+target
+tmp
+producer.iml
+recruitment_task.pdf
+
+
 # Compiled class file
 *.class
 
