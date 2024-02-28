@@ -39,18 +39,13 @@ services:
     container_name: temperature_producer
     depends_on:
       - kafka
-      - test_topic_create
+      - create_default_topic
     build:
       context: producer
       dockerfile: Dockerfile
     environment:
-      #- JAVA_OPTS=-Dbootstrap.servers=kafka:9092
+      - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
       - TEMPERATURE_TOPIC_NAME=temperatures
-#      args:
-#        - PYPI_NEXUS_PULLER
-#        - PYPI_NEXUS_PULLER_PASS
-#    entrypoint:
-#      kafka-topics.sh --create --topic test_topic_1 --bootstrap-server kafka:9092
     networks:
       - kafka_network
