@@ -1,5 +1,6 @@
 package letownia;
 
+import letownia.model.TemperatureMeasurement;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -9,40 +10,40 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-
-        Properties properties = new Properties();
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String temperatureTopicName = System.getenv("TEMPERATURE_TOPIC_NAME");
-        if(bootstrapServers == null) {
-            bootstrapServers = "0.0.0.0:9093";
-        }
+        Objects.requireNonNull(bootstrapServers);
+        Objects.requireNonNull(temperatureTopicName);
 
-        log.info("Producer Starting and connecting to bootstrap server: " + bootstrapServers);
 
+        log.info("Producer Starting, connecting to server {} and topic {} .", bootstrapServers, temperatureTopicName);
+        Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class.getName());
         //TODO - decide on a more sensible value (1500 is for speed of testing)
         properties.put("max.block.ms", 1500);
 
-        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+        KafkaProducer<String, TemperatureMeasurement> producer = new KafkaProducer<>(properties);
 
-        ProducerRecord<String, String> producerRecord =
-                new ProducerRecord<>(temperatureTopicName, "figure out this format");
+        ProducerRecord<String, TemperatureMeasurement> producerRecord =
+                new ProducerRecord<>(temperatureTopicName, new TemperatureMeasurement(1.0, 21.0));
 
         // send data - asynchronous
         Future<RecordMetadata> future = producer.send(producerRecord);
 
         try {
-            log.info("Future : " + future.get());
+            log.info("Future : {}", future.get());
         } catch (InterruptedException e) {
             log.error("InterruptedException", e);
         } catch (ExecutionException e) {

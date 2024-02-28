@@ -3,7 +3,7 @@ target
 tmp
 producer.iml
 recruitment_task.pdf
-
+dependency-reduced-pom.xml
 
 # Compiled class file
 *.class
