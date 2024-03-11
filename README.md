@@ -1,16 +1,13 @@
 ## kontakt_io_task
 
-# Start zookeeper
+# Zookeeper
 
-To start zookeeper run ( https://kafka.apache.org/quickstart ):
-```
-borg@borgs-MacBook-Pro:~/Desktop/kafka_2.13-3.6.1$ ~/Desktop/kafka_2.13-3.6.1/bin/zookeeper-server-start.sh config/zookeeper.properties
-```
-Or using Docker : 
-```
-docker run --name some-zookeeper --restart always -d zookeeper:3.7.2
-```
-- we probably want zookeeper to be in 'standalone mode'  (no redundancy, and such)
+Newer versions of kafka handle configuration internally and do not use zookeeper
 
-# Start the Kafka broker service
-$ bin/kafka-server-start.sh config/server.properties
+# Useful testing commands:
+
+```
+I have no name!@02ce8cf6e963:/$ kafka-console-consumer.sh --topic temperatures --from-beginning --bootstrap-server kafka:9092
+{"time":1.0,"temperature":21.0}
+Processed a total of 1 messages
+```

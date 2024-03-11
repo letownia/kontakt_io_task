@@ -85,7 +85,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>letownia.Main</mainClass>
+                            <mainClass>org.temperature.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -103,7 +103,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                        <mainClass>letownia.Main</mainClass>
+                                        <mainClass>org.temperature.Main</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

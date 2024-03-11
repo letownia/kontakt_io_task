@@ -35,17 +35,19 @@ services:
       kafka-topics.sh --create --topic temperatures --bootstrap-server kafka:9092
     networks:
       - kafka_network
-  temperature_producer:
-    container_name: temperature_producer
+  temperature_generator:
+    container_name: temperature_generator
     depends_on:
       - kafka
       - create_default_topic
     build:
-      context: producer
+      context: temperature_generator
       dockerfile: Dockerfile
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
       - TEMPERATURE_TOPIC_NAME=temperatures
+      - EVENT_DELAY_MS=1000
+      - NUMBER_OF_EVENTS=20
     networks:
       - kafka_network
