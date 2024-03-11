@@ -35,14 +35,15 @@ services:
       kafka-topics.sh --create --topic temperatures --bootstrap-server kafka:9092
     networks:
       - kafka_network
-  temperature_generator:
-    container_name: temperature_generator
+  temperature_producer:
+    container_name: temperature_producer
     depends_on:
       - kafka
       - create_default_topic
-    build:
-      context: temperature_generator
-      dockerfile: Dockerfile
+#    build:
+#      context: temperature_producer
+#      dockerfile: Dockerfile
+    image: producer:v5
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092

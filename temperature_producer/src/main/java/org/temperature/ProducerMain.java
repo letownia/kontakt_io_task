@@ -18,8 +18,8 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import static java.lang.System.currentTimeMillis;
 
-public class Main {
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
+public class ProducerMain {
+    private static final Logger log = LoggerFactory.getLogger(ProducerMain.class);
 
     /**
      * Randomly modifies original by a small amount.
@@ -59,7 +59,7 @@ public class Main {
         KafkaProducer<String, TemperatureMeasurement> producer = new KafkaProducer<>(properties);
 
 
-        ThreadLocalRandom.current().doubles(number_of_events, 20, 25).map(Main::fluctuateRandomly)
+        ThreadLocalRandom.current().doubles(number_of_events, 20, 25).map(ProducerMain::fluctuateRandomly)
                 .mapToObj(x -> new ProducerRecord<String, TemperatureMeasurement>(temperatureTopicName,
                         new TemperatureMeasurement(currentTimeMillis(), x)))
                 .peek(x -> {
@@ -70,7 +70,7 @@ public class Main {
                                     throw new RuntimeException(e);
                                 }
                             }
-                            log.info("Producer sending {}", x);
+                            log.info("Producer sending Measurement : {}", x.value());
 
                         }
                 ).forEach(x -> producer.send(x));
