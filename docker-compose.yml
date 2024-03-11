@@ -52,3 +52,20 @@ services:
       - NUMBER_OF_EVENTS=20
     networks:
       - kafka_network
+  temperature_collector:
+    container_name: temperature_collector
+    depends_on:
+      - kafka
+      - create_default_topic
+    #    build:
+    #      context: temperature_collector
+    #      dockerfile: Dockerfile
+    image: collector:v2
+    ports:
+      - "8081:8080"
+    environment:
+      - JAVA_OPTS=
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - TEMPERATURE_TOPIC_NAME=temperatures
+    networks:
+      - kafka_network
