@@ -9,7 +9,9 @@ public class TemperatureController {
 
     @GetMapping("/")
     public String index() {
-        return "Greetings from Temperature Collector mofo!";
+        return "Greetings from Temperature Collector potential future project manager from Kontakt IO!";
     }
+
+
 
 }
