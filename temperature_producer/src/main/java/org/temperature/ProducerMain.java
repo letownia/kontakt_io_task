@@ -36,6 +36,8 @@ public class ProducerMain {
             return original;
         }
     }
+    private static String thermometer_name ="thermometer_1";
+
 
     public static void main(String[] args) {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
@@ -61,7 +63,7 @@ public class ProducerMain {
 
         ThreadLocalRandom.current().doubles(number_of_events, 20, 25).map(ProducerMain::fluctuateRandomly)
                 .mapToObj(x -> new ProducerRecord<String, TemperatureMeasurement>(temperatureTopicName,
-                        new TemperatureMeasurement(currentTimeMillis(), x)))
+                        new TemperatureMeasurement(currentTimeMillis(), x, thermometer_name)))
                 .peek(x -> {
                             if (eventDelayMs > 0) {
                                 try {
@@ -80,6 +82,6 @@ public class ProducerMain {
 
 
     private static ProducerRecord<String, TemperatureMeasurement> generateProducerRecord(String topicName) {
-        return new ProducerRecord<>(topicName, new TemperatureMeasurement(currentTimeMillis(), 21.0));
+        return new ProducerRecord<>(topicName, new TemperatureMeasurement(currentTimeMillis(), 21.0, thermometer_name));
     }
 }

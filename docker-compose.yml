@@ -43,7 +43,7 @@ services:
 #    build:
 #      context: temperature_producer
 #      dockerfile: Dockerfile
-    image: producer:v5
+    image: producer:v7
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
@@ -52,20 +52,42 @@ services:
       - NUMBER_OF_EVENTS=20
     networks:
       - kafka_network
+  postgres_db:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      - POSTGRES_PASSWORD=s3cr3t
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./init_db.sql:/init_db.sql
+      - ./sample_db_data.sql:/sample_db_data.sql
+      - temperature_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - kafka_network
   temperature_collector:
     container_name: temperature_collector
     depends_on:
+      - postgres_db
       - kafka
       - create_default_topic
     #    build:
     #      context: temperature_collector
     #      dockerfile: Dockerfile
-    image: collector:v4
+    image: collector:v8
     ports:
       - "8081:8080"
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
       - TEMPERATURE_TOPIC_NAME=temperatures
+      - SPRING_DATASOURCE_USERNAME=temperature_collector
+      - SPRING_DATASOURCE_PASSWORD=sK2rPjqfufz30jT
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/temperature_db
     networks:
       - kafka_network
+
+volumes:
+  temperature_pg_data:
+    name: temperature_pg_data
