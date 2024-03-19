@@ -18,10 +18,12 @@ CREATE TABLE temperature (
 );
 
 
---  GRANT ALL PRIVILEGES ON DATABASE temperature_db TO temperature_collector;
---BOOTSTRAP_SERVERS=127.0.0.1:9094;SPRING_DATASOURCE_PASSWORD=sK2rPjqfufz30jT;SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/;SPRING_DATASOURCE_USERNAME=temperature_collector;TEMPERATURE_TOPIC_NAME=temperatures
-sK2rPjqfufz30jT
-temperature_collector
 
---postgres=# GRANT pg_read_all_data TO temperature_collector;
---postgres=# GRANT pg_write_all_data TO temperature_collector;
+CREATE USER temperature_collector WITH ENCRYPTED PASSWORD 'sK2rPjqfufz30jT';
+
+GRANT all privileges on database temperature_db to temperature_collector ;
+-- WARNING / TODO - next two lines should be changed. since it grants privileges on all databases
+GRANT pg_read_all_data TO temperature_collector;
+GRANT pg_write_all_data TO temperature_collector;
+
+
