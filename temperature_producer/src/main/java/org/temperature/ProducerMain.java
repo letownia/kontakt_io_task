@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -21,27 +22,15 @@ import static java.lang.System.currentTimeMillis;
 public class ProducerMain {
     private static final Logger log = LoggerFactory.getLogger(ProducerMain.class);
 
-    /**
-     * Randomly modifies original by a small amount.
-     * <p>
-     * Current implementation is 10% to modify by 0 to 5
-     *
-     * @param original
-     * @return
-     */
-    static Double fluctuateRandomly(Double original) {
-        if (new Random().nextDouble() > 0.9) {
-            return original + new Random().nextDouble() * 5;
-        } else {
-            return original;
-        }
-    }
     private static String thermometer_name ="thermometer_1";
 
 
     public static void main(String[] args) {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String temperatureTopicName = System.getenv("TEMPERATURE_TOPIC_NAME");
+        Integer minimumTemperature = Integer.valueOf(Optional.of(System.getenv("MINIMUM_TEMPERATURE")).orElse("20"));
+        Integer maximumTemperature = Integer.valueOf(Optional.of(System.getenv("MAXIMUM_TEMPERATURE")).orElse("30"));
+
         Integer eventDelayMs = Integer.valueOf(System.getenv("EVENT_DELAY_MS"));
         Integer number_of_events = Integer.valueOf(System.getenv("NUMBER_OF_EVENTS"));
 
@@ -61,7 +50,7 @@ public class ProducerMain {
         KafkaProducer<String, TemperatureMeasurement> producer = new KafkaProducer<>(properties);
 
 
-        ThreadLocalRandom.current().doubles(number_of_events, 20, 25).map(ProducerMain::fluctuateRandomly)
+        ThreadLocalRandom.current().doubles(number_of_events, minimumTemperature, maximumTemperature)
                 .mapToObj(x -> new ProducerRecord<String, TemperatureMeasurement>(temperatureTopicName,
                         new TemperatureMeasurement(currentTimeMillis(), x, thermometer_name)))
                 .peek(x -> {

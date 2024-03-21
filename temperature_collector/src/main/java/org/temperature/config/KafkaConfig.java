@@ -1,4 +1,4 @@
-package org.temperature;
+package org.temperature.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,10 +14,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.temperature.model.TemperatureMeasurement;
-import org.temperature.model.db.Room;
 
-
-import java.awt.print.Book;
 import java.util.HashMap;
 import java.util.Map;
 

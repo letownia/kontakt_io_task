@@ -43,13 +43,15 @@ services:
 #    build:
 #      context: temperature_producer
 #      dockerfile: Dockerfile
-    image: producer:v7
+    image: producer:v9
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
       - TEMPERATURE_TOPIC_NAME=temperatures
       - EVENT_DELAY_MS=1000
       - NUMBER_OF_EVENTS=20
+      - MINIMUM_TEMPERATURE=20
+      - MAXIMUM_TEMPERATURE=32
     networks:
       - kafka_network
   postgres_db:
