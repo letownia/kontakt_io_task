@@ -1,4 +1,4 @@
-package org.temperature;
+package org.temperature.controller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,4 +44,5 @@ public class TestRestController {
     String body = this.restTemplate.getForObject("/", String.class);
     assertThat(body).contains("Greetings");
   }
+
 }

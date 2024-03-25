@@ -77,7 +77,7 @@ services:
     #    build:
     #      context: temperature_collector
     #      dockerfile: Dockerfile
-    image: collector:v8
+    image: collector:v9
     ports:
       - "8081:8080"
     environment:
@@ -87,6 +87,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=temperature_collector
       - SPRING_DATASOURCE_PASSWORD=sK2rPjqfufz30jT
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/temperature_db
+      - DETECTION_ALGORITHM=timeSensitive
     networks:
       - kafka_network
 

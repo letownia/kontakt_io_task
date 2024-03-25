@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 public class TimeAgnosticAlgorithm implements AnomalyDetectionAlgorithm {
 
-  private static final Logger log = LoggerFactory.getLogger(KafkaConfig.class);
+  private static final Logger log = LoggerFactory.getLogger(TimeAgnosticAlgorithm.class);
 
-  private static final int MEAN_WINDOW_SIZE = 10;
-  private static final double OUTLIER_THRESHOLD = 5.0;
+  static final int MEAN_WINDOW_SIZE = 10;
+  static final double OUTLIER_THRESHOLD_TEMPERATURE = 5.0;
 
   @Override
   public Set<TemperatureMeasurement> findAllAnomalies(
@@ -29,11 +29,12 @@ public class TimeAgnosticAlgorithm implements AnomalyDetectionAlgorithm {
           .mapToDouble(x -> x.temperature()).average().getAsDouble();
       Set<TemperatureMeasurement> newAnomalies =
           temperatureMeasurements.stream().skip(i).limit(MEAN_WINDOW_SIZE)
-              .filter(x -> Math.abs(x.temperature() - averageTemp) >= OUTLIER_THRESHOLD)
+              .filter(x -> Math.abs(x.temperature() - averageTemp) >= OUTLIER_THRESHOLD_TEMPERATURE)
               .collect(Collectors.toSet());
-      log.info("Found new anomalies" + foundAnomalies);
+      log.info("Found " + newAnomalies.size() + " new anomalies");
       foundAnomalies.addAll(newAnomalies);
     }
+    log.info("In total found" + foundAnomalies.size()+ " anomalies :" + foundAnomalies);
     return foundAnomalies;
   }
 }
