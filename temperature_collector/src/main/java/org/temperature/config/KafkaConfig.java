@@ -22,38 +22,41 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfig {
-    private static final Logger log = LoggerFactory.getLogger(KafkaConfig.class);
+
+  private static final Logger log = LoggerFactory.getLogger(KafkaConfig.class);
 
 
-    @Autowired
-    private Environment environment;
+  @Autowired
+  private Environment environment;
 
 
-    @Bean
-    public ConsumerFactory<Integer, TemperatureMeasurement> kafkaConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(defaultKafkaConfig(),
-                new StringDeserializer(),
-                new JsonDeserializer(TemperatureMeasurement.class));
-    }
+  @Bean
+  public ConsumerFactory<Integer, TemperatureMeasurement> kafkaConsumerFactory() {
+    return new DefaultKafkaConsumerFactory<>(defaultKafkaConfig(),
+        new StringDeserializer(),
+        new JsonDeserializer(TemperatureMeasurement.class));
+  }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<Integer, TemperatureMeasurement>
-    kafkaListenerContainerFactory(ConsumerFactory<Integer, TemperatureMeasurement> kafkaConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<Integer, TemperatureMeasurement> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(kafkaConsumerFactory);
-        return factory;
-    }
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<Integer, TemperatureMeasurement>
+  kafkaListenerContainerFactory(
+      ConsumerFactory<Integer, TemperatureMeasurement> kafkaConsumerFactory) {
+    ConcurrentKafkaListenerContainerFactory<Integer, TemperatureMeasurement> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(kafkaConsumerFactory);
+    return factory;
+  }
 
-    private Map<String, Object> defaultKafkaConfig() {
-        log.info(" environment.getProperty(\"BOOTSTRAP_SERVERS\")=" +  environment.getProperty("BOOTSTRAP_SERVERS"));
-        log.info("Initializing props "+ System.getenv("BOOTSTRAP_SERVERS"));
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getenv("BOOTSTRAP_SERVERS"));
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "temperature_group_name");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        return props;
-    }
+  private Map<String, Object> defaultKafkaConfig() {
+    log.info(" environment.getProperty(\"BOOTSTRAP_SERVERS\")=" + environment.getProperty(
+        "BOOTSTRAP_SERVERS"));
+    log.info("Initializing props " + System.getenv("BOOTSTRAP_SERVERS"));
+    Map<String, Object> props = new HashMap<>();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getenv("BOOTSTRAP_SERVERS"));
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "temperature_group_name");
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    return props;
+  }
 
 }

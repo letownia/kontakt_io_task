@@ -7,30 +7,31 @@ import java.util.Set;
 
 @Entity
 public class Thermometer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(unique=true)
-    private String thermometerName;
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
-    @OneToMany(mappedBy = "thermometer")
-    private Set<Temperature> temperatures = new HashSet<>();
 
-    public Room getRoom() {
-        return room;
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(unique = true)
+  private String thermometerName;
+  @ManyToOne
+  @JoinColumn(name = "room_id")
+  private Room room;
+  @OneToMany(mappedBy = "thermometer")
+  private Set<Temperature> temperatures = new HashSet<>();
 
-    public String getThermometerName() {
-        return thermometerName;
-    }
+  public Room getRoom() {
+    return room;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public String getThermometerName() {
+    return thermometerName;
+  }
 
-    public Set<Temperature> getTemperatures() {
-        return temperatures;
-    }
+  public Long getId() {
+    return id;
+  }
+
+  public Set<Temperature> getTemperatures() {
+    return temperatures;
+  }
 }

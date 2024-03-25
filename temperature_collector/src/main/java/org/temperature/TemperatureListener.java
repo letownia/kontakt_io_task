@@ -14,22 +14,23 @@ import org.temperature.repository.ThermometerRepository;
 @Component
 public class TemperatureListener {
 
-    @Autowired
-    private TemperatureRepository temperatureRepository;
+  @Autowired
+  private TemperatureRepository temperatureRepository;
 
-    @Autowired
-    private ThermometerRepository thermometerRepository;
-    private static final Logger log = LoggerFactory.getLogger(TemperatureListener.class);
+  @Autowired
+  private ThermometerRepository thermometerRepository;
+  private static final Logger log = LoggerFactory.getLogger(TemperatureListener.class);
 
-    @KafkaListener(id = "1", topics = "${temperature.topic.name}")
-    public void listen(TemperatureMeasurement measurement) {
-        log.info("Received TemperatureMeasurement " + measurement);
+  @KafkaListener(id = "1", topics = "${temperature.topic.name}")
+  public void listen(TemperatureMeasurement measurement) {
+    log.info("Received TemperatureMeasurement " + measurement);
 
-        Thermometer thermometer = thermometerRepository.findByThermometerName(measurement.thermometerName());
-        Temperature temperature = new Temperature();
-        temperature.setTemperature(measurement.temperature());
-        temperature.setTimestampMs(measurement.timestampMs());
-        temperature.setThermometer(thermometer);
-        temperatureRepository.save(temperature);
-    }
+    Thermometer thermometer = thermometerRepository.findByThermometerName(
+        measurement.thermometerName());
+    Temperature temperature = new Temperature();
+    temperature.setTemperature(measurement.temperature());
+    temperature.setTimestampMs(measurement.timestampMs());
+    temperature.setThermometer(thermometer);
+    temperatureRepository.save(temperature);
+  }
 }

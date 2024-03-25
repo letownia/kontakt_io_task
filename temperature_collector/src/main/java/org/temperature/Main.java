@@ -9,13 +9,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class Main {
 
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
+  private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
-        String temperatureTopicName = System.getenv("TEMPERATURE_TOPIC_NAME");
-        log.info("Starting TemperatureCollector");
+  public static void main(String[] args) {
+    String temperatureTopicName = System.getenv("TEMPERATURE_TOPIC_NAME");
+    log.info("Starting TemperatureCollector");
 
-        ConfigurableApplicationContext applicationContext = SpringApplication.run(Main.class, args);
-    }
+    ConfigurableApplicationContext applicationContext = SpringApplication.run(Main.class, args);
+  }
 
 }

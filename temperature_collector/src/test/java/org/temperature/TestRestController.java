@@ -24,24 +24,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 @AutoConfigureMockMvc
 public class TestRestController {
 
-    @Autowired
-    private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-    @MockBean
-    private TemperatureRepository temperatureRepository;
+  @MockBean
+  private TemperatureRepository temperatureRepository;
 
-    @MockBean
-    private RoomRepository roomRepository;
+  @MockBean
+  private RoomRepository roomRepository;
 
-    @MockBean
-    private ThermometerRepository thermometerRepository;
+  @MockBean
+  private ThermometerRepository thermometerRepository;
 
-    @Test
-    public void exampleTest() {
-        String body = this.restTemplate.getForObject("/", String.class);
-        assertThat(body).contains("Greetings");
-    }
+  @Test
+  public void exampleTest() {
+    String body = this.restTemplate.getForObject("/", String.class);
+    assertThat(body).contains("Greetings");
+  }
 }

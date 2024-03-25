@@ -4,42 +4,43 @@ import jakarta.persistence.*;
 
 @Entity
 public class Temperature {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "thermometer_id")
-    private Thermometer thermometer;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    private Long timestampMs;
-    private Double temperature;
+  @ManyToOne
+  @JoinColumn(name = "thermometer_id")
+  private Thermometer thermometer;
 
-    public Thermometer getThermometer() {
-        return thermometer;
-    }
+  private Long timestampMs;
+  private Double temperature;
 
-    public long getId() {
-        return id;
-    }
+  public Thermometer getThermometer() {
+    return thermometer;
+  }
 
-    public Long getTimestampMs() {
-        return timestampMs;
-    }
+  public long getId() {
+    return id;
+  }
 
-    public Double getTemperature() {
-        return temperature;
-    }
+  public Long getTimestampMs() {
+    return timestampMs;
+  }
 
-    public void setTimestampMs(Long timestampMs) {
-        this.timestampMs = timestampMs;
-    }
+  public Double getTemperature() {
+    return temperature;
+  }
 
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
+  public void setTimestampMs(Long timestampMs) {
+    this.timestampMs = timestampMs;
+  }
 
-    public void setThermometer(Thermometer thermometer) {
-        this.thermometer = thermometer;
-    }
+  public void setTemperature(Double temperature) {
+    this.temperature = temperature;
+  }
+
+  public void setThermometer(Thermometer thermometer) {
+    this.thermometer = thermometer;
+  }
 }
