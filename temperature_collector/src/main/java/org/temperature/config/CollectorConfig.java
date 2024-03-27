@@ -20,7 +20,7 @@ public class CollectorConfig {
     if (algorithm.equalsIgnoreCase("timeAgnostic")) {
       return new TimeAgnosticAlgorithm();
     } else if (algorithm.equalsIgnoreCase("timeSensitive")) {
-      return new TimeSensitiveAlgorithm(10);
+      return new TimeSensitiveAlgorithm(10*1000);
     } else {
       throw new RuntimeException(
           "Invalid configuration - incorrect algorithm, see : detection.algorithm : "

@@ -15,17 +15,19 @@ public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
 
   private static final Logger log = LoggerFactory.getLogger(TimeSensitiveAlgorithm.class);
 
-  private static final double OUTLIER_THRESHOLD_TEMPERATURE = 5.0;
+  static final double OUTLIER_THRESHOLD_TEMPERATURE = 5.0;
 
-  private final int windowSizeInSeconds;
+  private final int windowSizeMs;
 
-  public TimeSensitiveAlgorithm(int windowSizeInSeconds) {
-    this.windowSizeInSeconds = windowSizeInSeconds;
+  public TimeSensitiveAlgorithm(int windowSizeMs) {
+    this.windowSizeMs = windowSizeMs;
   }
 
 
   /**
    * Returns a set of all anomalies relative to other temperatures in a similar time-frame.
+   *
+   * TODO - consider refactoring to a double for loop (rather than mixing for-loop + streams)
    *
    * @param unsortedTemperatures
    * @return
@@ -48,7 +50,7 @@ public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
       long startTimeMs = sortedTemperatures.get(start).timestampMs();
       int end = -1;
       for(int i = Math.max(previousWindowEnd, start);
-          i < sortedTemperatures.size() && sortedTemperatures.get(i).timestampMs() <= startTimeMs + windowSizeInSeconds*1000;
+          i < sortedTemperatures.size() && sortedTemperatures.get(i).timestampMs() <= startTimeMs + windowSizeMs;
           i++) {
         end = i;
       }
