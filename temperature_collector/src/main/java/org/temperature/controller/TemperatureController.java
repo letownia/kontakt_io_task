@@ -1,6 +1,7 @@
 package org.temperature.controller;
 
 
+import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.temperature.anomalies.AnomalyDetectionAlgorithm;
 import org.temperature.model.TemperatureMeasurement;
-import org.temperature.model.db.Temperature;
+import org.temperature.model.db.Room;
 import org.temperature.model.db.Thermometer;
 import org.temperature.repository.RoomRepository;
 import org.temperature.repository.TemperatureRepository;
@@ -38,28 +39,40 @@ public class TemperatureController {
     return new ResponseEntity<>("Greetings from Temperature Collector!", HttpStatus.OK);
   }
 
-  @GetMapping("/thermomemeter/{thermometer_name}/anomalies")
+  @GetMapping("/thermometer/{identifier}/anomalies")
   public ResponseEntity<String> getAnomaliesForThermometer(
-      @PathVariable("thermometer_name") String thermometerName) {
-    Thermometer found = thermometerRepository.findByThermometerName(thermometerName);
+      @PathVariable("identifier") String identifier) {
+    Thermometer found = thermometerRepository.findByIdentifier(identifier);
     if (found == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cause description here");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Thermometer " + identifier + " not found");
     } else {
       List<TemperatureMeasurement> temperatureMeasurements = found.getTemperatures().stream()
           .map(x -> new TemperatureMeasurement(x.getTimestampMs(), x.getTemperature(),
-              x.getThermometer().getThermometerName()))
+              x.getThermometer().getIdentifier()))
           .collect(Collectors.toList());
       Set<TemperatureMeasurement> anomalies = anomalyDetectionAlgorithm.findAllAnomalies(
           temperatureMeasurements);
       String anomaliesString = anomalies.stream().collect(Collectors.toList()).toString();
-      return new ResponseEntity<>(anomaliesString, HttpStatus.NOT_IMPLEMENTED);
+      return new ResponseEntity<>(anomaliesString, HttpStatus.OK);
     }
   }
 
-  @GetMapping("/room/{room_id}/anomalies")
-  public ResponseEntity<String> getAnomaliesForRoom(@PathVariable("room_id") String roomId) {
-    return new ResponseEntity<>("TODO : List of all anomalies by roomId",
-        HttpStatus.NOT_IMPLEMENTED);
+  @GetMapping("/room/{identifier}/anomalies")
+  public ResponseEntity<String> getAnomaliesForRoom(@PathVariable("name") String identifier) {
+    Room foundRoom = roomRepository.findByIdentifier(identifier);
+    if(foundRoom == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room  " + identifier + " not found");
+    }
+    Set<TemperatureMeasurement> anomalies = new HashSet<>();
+    for(Thermometer thermometer : foundRoom.getThermometers()) {
+      List<TemperatureMeasurement> temperatureMeasurements = thermometer.getTemperatures().stream()
+          .map(x -> new TemperatureMeasurement(x.getTimestampMs(), x.getTemperature(),
+              x.getThermometer().getIdentifier()))
+          .collect(Collectors.toList());
+      anomalies.addAll( anomalyDetectionAlgorithm.findAllAnomalies(temperatureMeasurements));
+    }
+    String anomaliesString = anomalies.stream().collect(Collectors.toList()).toString();
+    return new ResponseEntity<>(anomaliesString, HttpStatus.NOT_IMPLEMENTED);
   }
 
   @GetMapping("/anomalies/outliers")

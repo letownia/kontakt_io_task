@@ -38,7 +38,7 @@ public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
     Set<TemperatureMeasurement> foundAnomalies = new HashSet<>();
 
     if (unsortedTemperatures.size() < 2) {
-      log.warn("At least 2 measurements are requried in order to determine time-sensitive anomalies");
+      log.warn("At least 2 measurements are required in order to determine time-sensitive anomalies");
       return Collections.EMPTY_SET;
     }
     List<TemperatureMeasurement> sortedTemperatures = unsortedTemperatures.stream()

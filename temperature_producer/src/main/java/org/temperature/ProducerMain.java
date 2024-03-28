@@ -22,7 +22,7 @@ import static java.lang.System.currentTimeMillis;
 public class ProducerMain {
     private static final Logger log = LoggerFactory.getLogger(ProducerMain.class);
 
-    private static String thermometer_name ="thermometer_1";
+    private static String identifier ="thermometer_1";
 
 
     public static void main(String[] args) {
@@ -52,7 +52,7 @@ public class ProducerMain {
 
         ThreadLocalRandom.current().doubles(number_of_events, minimumTemperature, maximumTemperature)
                 .mapToObj(x -> new ProducerRecord<String, TemperatureMeasurement>(temperatureTopicName,
-                        new TemperatureMeasurement(currentTimeMillis(), x, thermometer_name)))
+                        new TemperatureMeasurement(currentTimeMillis(), x, identifier)))
                 .peek(x -> {
                             if (eventDelayMs > 0) {
                                 try {
@@ -71,6 +71,6 @@ public class ProducerMain {
 
 
     private static ProducerRecord<String, TemperatureMeasurement> generateProducerRecord(String topicName) {
-        return new ProducerRecord<>(topicName, new TemperatureMeasurement(currentTimeMillis(), 21.0, thermometer_name));
+        return new ProducerRecord<>(topicName, new TemperatureMeasurement(currentTimeMillis(), 21.0, identifier));
     }
 }

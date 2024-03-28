@@ -15,10 +15,10 @@ public class Room {
   @OneToMany(mappedBy = "room")
   private Set<Thermometer> thermometers = new HashSet<>();
   @Column(unique = true)
-  private String roomName;
+  private String identifier;
 
-  public String getRoomName() {
-    return roomName;
+  public String getIdentifier() {
+    return identifier;
   }
 
   public Set<Thermometer> getThermometers() {

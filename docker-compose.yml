@@ -1,10 +1,5 @@
 version: "3.7"
 
-# WARNING !!!
-# What actually worked is using Docker run instead of compose :
-# https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md#using-the-command-line
-# - docker network create app-tier --driver bridge
-
 networks:
   kafka_network:
     driver: bridge
@@ -43,7 +38,7 @@ services:
 #    build:
 #      context: temperature_producer
 #      dockerfile: Dockerfile
-    image: producer:v9
+    image: producer:v11
     environment:
       - JAVA_OPTS=
       - BOOTSTRAP_SERVERS=kafka:9092
@@ -74,10 +69,7 @@ services:
       - postgres_db
       - kafka
       - create_default_topic
-    #    build:
-    #      context: temperature_collector
-    #      dockerfile: Dockerfile
-    image: collector:v9
+    image: collector:v10
     ports:
       - "8081:8080"
     environment:

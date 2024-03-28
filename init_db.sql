@@ -1,12 +1,15 @@
+CREATE DATABASE temperature_db;
+\c temperature_db;
+
 CREATE TABLE room (
   id SERIAL PRIMARY KEY,
-  room_name VARCHAR(64)
+  identifier VARCHAR(64)
 );
 
 
 CREATE TABLE thermometer (
   id SERIAL PRIMARY KEY,
-  thermometer_name VARCHAR(64) NOT NULL,
+  identifier VARCHAR(64) NOT NULL,
   room_id INTEGER REFERENCES room NOT NULL
 );
 

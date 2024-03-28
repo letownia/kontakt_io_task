@@ -12,7 +12,7 @@ public class Thermometer {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Column(unique = true)
-  private String thermometerName;
+  private String identifier;
   @ManyToOne
   @JoinColumn(name = "room_id")
   private Room room;
@@ -23,8 +23,8 @@ public class Thermometer {
     return room;
   }
 
-  public String getThermometerName() {
-    return thermometerName;
+  public String getIdentifier() {
+    return identifier;
   }
 
   public Long getId() {

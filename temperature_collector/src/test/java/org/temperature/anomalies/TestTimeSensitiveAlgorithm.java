@@ -25,7 +25,7 @@ public class TestTimeSensitiveAlgorithm {
       () -> generateSpecificTemperature.apply(Math.random());
 
   private final static int DEFAULT_WINDOW_SIZE_MS = 10*1000;
-  private final static String THERMOMETER_NAME ="test_1";
+  private final static String THERMOMETER_IDENTIFIER ="test_1";
 
   //If these tests are ever to be run in parallel mockTimeMs cannot be static.
   private static long mockTimeMs = 1000l;
@@ -41,7 +41,7 @@ public class TestTimeSensitiveAlgorithm {
     List<TemperatureMeasurement> measurements =
         Stream.generate(generateTwentyDegreeTemperature).limit(9).collect(
         Collectors.toList());
-    TemperatureMeasurement anomaly = new TemperatureMeasurement(getMockTimeMs(), outlierTemp, THERMOMETER_NAME);
+    TemperatureMeasurement anomaly = new TemperatureMeasurement(getMockTimeMs(), outlierTemp, THERMOMETER_IDENTIFIER);
     measurements.add(anomaly);
     Set<TemperatureMeasurement> anomalies = algorithm.findAllAnomalies(measurements);
     assertTrue(anomalies.size() == 1 && anomalies.iterator().next().temperature()== outlierTemp);
@@ -56,7 +56,7 @@ public class TestTimeSensitiveAlgorithm {
     List<TemperatureMeasurement> measurements =
         Stream.generate(generateTwentyDegreeTemperature).limit(9).collect(
             Collectors.toList());
-    TemperatureMeasurement anomaly = new TemperatureMeasurement(getMockTimeMs() +  sleepExtraMs, outlierTemp, THERMOMETER_NAME);
+    TemperatureMeasurement anomaly = new TemperatureMeasurement(getMockTimeMs() +  sleepExtraMs, outlierTemp, THERMOMETER_IDENTIFIER);
     measurements.add(anomaly);
     Set<TemperatureMeasurement> anomalies = algorithm.findAllAnomalies(measurements);
     assertTrue(anomalies.size() == 0);

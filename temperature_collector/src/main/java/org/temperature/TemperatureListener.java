@@ -25,8 +25,7 @@ public class TemperatureListener {
   public void listen(TemperatureMeasurement measurement) {
     log.info("Received TemperatureMeasurement " + measurement);
 
-    Thermometer thermometer = thermometerRepository.findByThermometerName(
-        measurement.thermometerName());
+    Thermometer thermometer = thermometerRepository.findByIdentifier(measurement.identifier());
     Temperature temperature = new Temperature();
     temperature.setTemperature(measurement.temperature());
     temperature.setTimestampMs(measurement.timestampMs());
