@@ -47,6 +47,7 @@ services:
       - NUMBER_OF_EVENTS=20
       - MINIMUM_TEMPERATURE=20
       - MAXIMUM_TEMPERATURE=32
+      - THERMOMETER_IDENTIFIER=thermometer_2
     networks:
       - kafka_network
   postgres_db:
