@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -22,7 +21,6 @@ import static java.lang.System.currentTimeMillis;
 public class ProducerMain {
     private static final Logger log = LoggerFactory.getLogger(ProducerMain.class);
 
-    private static String identifier ="thermometer_1";
 
 
     public static void main(String[] args) {
@@ -30,6 +28,8 @@ public class ProducerMain {
         String temperatureTopicName = System.getenv("TEMPERATURE_TOPIC_NAME");
         Integer minimumTemperature = Integer.valueOf(Optional.of(System.getenv("MINIMUM_TEMPERATURE")).orElse("20"));
         Integer maximumTemperature = Integer.valueOf(Optional.of(System.getenv("MAXIMUM_TEMPERATURE")).orElse("30"));
+
+        String identifier = Optional.of(System.getenv("THERMOMETER_IDENTIFIER")).orElse("thermometer_1");
 
         Integer eventDelayMs = Integer.valueOf(System.getenv("EVENT_DELAY_MS"));
         Integer number_of_events = Integer.valueOf(System.getenv("NUMBER_OF_EVENTS"));
@@ -67,10 +67,5 @@ public class ProducerMain {
                 ).forEach(x -> producer.send(x));
 
         producer.flush();
-    }
-
-
-    private static ProducerRecord<String, TemperatureMeasurement> generateProducerRecord(String topicName) {
-        return new ProducerRecord<>(topicName, new TemperatureMeasurement(currentTimeMillis(), 21.0, identifier));
     }
 }
