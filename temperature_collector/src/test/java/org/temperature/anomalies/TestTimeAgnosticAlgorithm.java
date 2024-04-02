@@ -1,10 +1,8 @@
 package org.temperature.anomalies;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.temperature.anomalies.TimeAgnosticAlgorithm.MEAN_WINDOW_SIZE;
 import static org.temperature.anomalies.TimeAgnosticAlgorithm.OUTLIER_THRESHOLD_TEMPERATURE;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -12,20 +10,28 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.Before;
 import org.junit.Test;
 import org.temperature.model.TemperatureMeasurement;
 
 public class TestTimeAgnosticAlgorithm {
 
+  private final int MEAN_WINDOW_SIZE = 10;
   //warning: nanoTime() is used rather than currentTimeMillis() in order to ensure each generated record is unique
   private static Function<Double,TemperatureMeasurement> generateSpecificTemperature = x -> new TemperatureMeasurement(System.nanoTime(), x,"therm_1");
   private static Supplier<TemperatureMeasurement> generateTwentyDegreeTemperature = () -> generateSpecificTemperature.apply(20.0);
   private static Supplier<TemperatureMeasurement> generateRandomTemperature = () -> generateSpecificTemperature.apply(Math.random());
 
+  private TimeAgnosticAlgorithm timeAgnosticAlgorithm;
+
+  @Before
+  public void init() {
+    timeAgnosticAlgorithm = new TimeAgnosticAlgorithm(MEAN_WINDOW_SIZE);
+  }
+
 
   @Test
   public void testTooFewElements() {
-    TimeAgnosticAlgorithm timeAgnosticAlgorithm = new TimeAgnosticAlgorithm();
     List<TemperatureMeasurement> measurements = Collections.nCopies(MEAN_WINDOW_SIZE - 1,
         new TemperatureMeasurement(1000l, 20.0, "therm_1"));
     Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(measurements);
@@ -33,14 +39,12 @@ public class TestTimeAgnosticAlgorithm {
   }
   @Test
   public void testEmptyList() {
-    TimeAgnosticAlgorithm timeAgnosticAlgorithm = new TimeAgnosticAlgorithm();
     Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(Collections.emptyList());
     assertTrue(anomalies.isEmpty());
   }
 
   @Test
   public void testNoAnomalies() {
-    TimeAgnosticAlgorithm timeAgnosticAlgorithm = new TimeAgnosticAlgorithm();
     List<TemperatureMeasurement> tenAnomalies= Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE).collect(
         Collectors.toList());
     Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(tenAnomalies);
@@ -50,7 +54,6 @@ public class TestTimeAgnosticAlgorithm {
 
   @Test
   public void test1Anomaly() {
-    TimeAgnosticAlgorithm timeAgnosticAlgorithm = new TimeAgnosticAlgorithm();
     List<TemperatureMeasurement> measurements = Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE).collect(
         Collectors.toList());
     TemperatureMeasurement anomaly = new TemperatureMeasurement(1000l, measurements.get(0)
@@ -65,8 +68,6 @@ public class TestTimeAgnosticAlgorithm {
 
   @Test
   public void testManyAnomalies() throws InterruptedException {
-    TimeAgnosticAlgorithm timeAgnosticAlgorithm = new TimeAgnosticAlgorithm();
-
     List<TemperatureMeasurement> measurements = Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE*5).collect(
         Collectors.toList());
     Double outlierTemperature= 20.0  + OUTLIER_THRESHOLD_TEMPERATURE*2;

@@ -17,9 +17,14 @@ CREATE TABLE temperature (
   id SERIAL PRIMARY KEY,
   thermometer_id INTEGER REFERENCES thermometer NOT NULL,
   timestamp_ms BIGINT NOT NULL,
-  temperature FLOAT8 NOT NULL
+  temperature FLOAT8 NOT NULL,
+  time_sensitive_anomaly BOOLEAN default FALSE NOT NULL,
+  time_agnostic_anomaly BOOLEAN default FALSE NOT NULL
 );
 
+CREATE INDEX temperature_timestamp_ms ON temperature(timestamp_ms);
+CREATE INDEX time_sensitive_anomaly ON temperature(time_sensitive_anomaly);
+CREATE INDEX time_agnostic_anomaly ON temperature(time_agnostic_anomaly);
 
 
 CREATE USER temperature_collector WITH ENCRYPTED PASSWORD 'sK2rPjqfufz30jT';

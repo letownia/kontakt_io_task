@@ -3,6 +3,8 @@ package org.temperature.anomalies;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.temperature.model.TemperatureMeasurement;
 
 import java.util.Comparator;
@@ -10,6 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.temperature.model.db.Temperature;
+import org.temperature.repository.TemperatureRepository;
+
 
 public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
 
@@ -17,22 +22,15 @@ public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
 
   static final double OUTLIER_THRESHOLD_TEMPERATURE = 5.0;
 
+  @Autowired
+  private TemperatureRepository temperatureRepository;
   private final int windowSizeMs;
 
   public TimeSensitiveAlgorithm(int windowSizeMs) {
     this.windowSizeMs = windowSizeMs;
   }
 
-
-  /**
-   * Returns a set of all anomalies relative to other temperatures in a similar time-frame.
-   *
-   * TODO - consider refactoring to a double for loop (rather than mixing for-loop + streams)
-   *
-   * @param unsortedTemperatures
-   * @return
-   */
-  @Override
+  @Override   @Deprecated
   public Set<TemperatureMeasurement> findAllAnomalies(
       List<TemperatureMeasurement> unsortedTemperatures) {
     Set<TemperatureMeasurement> foundAnomalies = new HashSet<>();
@@ -83,5 +81,17 @@ public class TimeSensitiveAlgorithm implements AnomalyDetectionAlgorithm {
     log.info("In total found" + foundAnomalies.size()+ " anomalies :" + foundAnomalies);
 
     return foundAnomalies;
+  }
+
+  @Override
+  public List<Temperature> findNewAnomaliesForNewTemperature(Temperature temperature) {
+    List<Temperature> temperatures = temperatureRepository
+        .getTemperaturesInRange(temperature.getTimestampMs()-1000*10, temperature.getTimestampMs(), temperature.getThermometer().getId());
+    double averageTemp = temperatures.stream().mapToDouble(x -> x.getTemperature()).average().getAsDouble();
+
+    return temperatures.stream()
+        .filter( x -> x.isTimeSensitiveAnomaly() == false)
+        .filter(x -> Math.abs(x.getTemperature() - averageTemp) >= OUTLIER_THRESHOLD_TEMPERATURE).collect(
+        Collectors.toList());
   }
 }

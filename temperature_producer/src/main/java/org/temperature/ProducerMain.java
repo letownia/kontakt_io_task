@@ -46,7 +46,6 @@ public class ProducerMain {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class.getName());
         //TODO - decide on a more sensible value (1500 is for speed of testing)
         properties.put("max.block.ms", 1500);
-
         KafkaProducer<String, TemperatureMeasurement> producer = new KafkaProducer<>(properties);
 
 

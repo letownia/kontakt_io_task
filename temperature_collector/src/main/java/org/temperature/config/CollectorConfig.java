@@ -14,17 +14,29 @@ public class CollectorConfig {
   @Autowired
   private Environment environment;
 
+//
+//  @Bean TimeAgnosticAlgorithm
+//  @Bean
+//  public AnomalyDetectionAlgorithm getAnomalyDetectionAlgorithm() {
+//    String algorithm = environment.getProperty("detection.algorithm", "TimeAgnostic");
+//    if (algorithm.equalsIgnoreCase("timeAgnostic")) {
+//      return new TimeAgnosticAlgorithm();
+//    } else if (algorithm.equalsIgnoreCase("timeSensitive")) {
+//      return new TimeSensitiveAlgorithm(10*1000);
+//    } else {
+//      throw new RuntimeException(
+//          "Invalid configuration - incorrect algorithm, see : detection.algorithm : "
+//              + algorithm);
+//    }
+//  }
+
   @Bean
-  public AnomalyDetectionAlgorithm getAnomalyDetectionAlgorithm() {
-    String algorithm = environment.getProperty("detection.algorithm", "TimeAgnostic");
-    if (algorithm.equalsIgnoreCase("timeAgnostic")) {
-      return new TimeAgnosticAlgorithm();
-    } else if (algorithm.equalsIgnoreCase("timeSensitive")) {
-      return new TimeSensitiveAlgorithm(10*1000);
-    } else {
-      throw new RuntimeException(
-          "Invalid configuration - incorrect algorithm, see : detection.algorithm : "
-              + algorithm);
-    }
+  public TimeSensitiveAlgorithm getTimeSensitiveAlgorithm() {
+    return new TimeSensitiveAlgorithm(10*1000);
+  }
+
+  @Bean
+  public TimeAgnosticAlgorithm getTimeAgnosticAlgorithm() {
+    return new TimeAgnosticAlgorithm(10);
   }
 }

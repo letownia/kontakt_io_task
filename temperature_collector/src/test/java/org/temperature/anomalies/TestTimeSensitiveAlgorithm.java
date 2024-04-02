@@ -1,11 +1,8 @@
 package org.temperature.anomalies;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.temperature.anomalies.TimeAgnosticAlgorithm.MEAN_WINDOW_SIZE;
 import static org.temperature.anomalies.TimeSensitiveAlgorithm.OUTLIER_THRESHOLD_TEMPERATURE;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -17,20 +14,17 @@ import org.temperature.model.TemperatureMeasurement;
 
 public class TestTimeSensitiveAlgorithm {
 
-  private static Function<Double,TemperatureMeasurement> generateSpecificTemperature
+  private final static Function<Double,TemperatureMeasurement> generateSpecificTemperature
       = x -> new TemperatureMeasurement(getMockTimeMs(), x,"therm_1");
-  private static Supplier<TemperatureMeasurement> generateTwentyDegreeTemperature =
+  private final static Supplier<TemperatureMeasurement> generateTwentyDegreeTemperature =
       () -> generateSpecificTemperature.apply(20.0);
-  private static Supplier<TemperatureMeasurement> generateRandomTemperature =
-      () -> generateSpecificTemperature.apply(Math.random());
-
   private final static int DEFAULT_WINDOW_SIZE_MS = 10*1000;
   private final static String THERMOMETER_IDENTIFIER ="test_1";
 
   //If these tests are ever to be run in parallel mockTimeMs cannot be static.
-  private static long mockTimeMs = 1000l;
+  private static long mockTimeMs = 1000L;
   private static long getMockTimeMs() {
-    return mockTimeMs += 1000l;
+    return mockTimeMs += 1000L;
   }
 
   @Test
@@ -59,6 +53,6 @@ public class TestTimeSensitiveAlgorithm {
     TemperatureMeasurement anomaly = new TemperatureMeasurement(getMockTimeMs() +  sleepExtraMs, outlierTemp, THERMOMETER_IDENTIFIER);
     measurements.add(anomaly);
     Set<TemperatureMeasurement> anomalies = algorithm.findAllAnomalies(measurements);
-    assertTrue(anomalies.size() == 0);
+    assertTrue(anomalies.isEmpty());
   }
 }
