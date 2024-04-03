@@ -1,94 +1,87 @@
 package org.temperature.anomalies;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.temperature.anomalies.TimeAgnosticAlgorithm.OUTLIER_THRESHOLD_TEMPERATURE;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.temperature.model.db.Temperature;
-import org.temperature.model.db.Thermometer;
-import org.temperature.repository.TemperatureRepository;
+import org.temperature.model.TemperatureMeasurement;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@Deprecated
 public class TestTimeAgnosticAlgorithm {
-  private static final int TEST_WINDOW_SIZE = 10;
-  @Mock
-  private static Thermometer defaultThermometer;
-  private static Function<Double, Temperature> generateSpecificTemperature =
-      (x) -> { Temperature t = new Temperature();
-               t.setTemperature(x);
-               t.setTimestampMs(System.nanoTime());
-               t.setThermometer(defaultThermometer);
-    return t;
-  };
 
-  private static Supplier<Temperature> generateTwentyDegreeTemperature = () -> generateSpecificTemperature.apply(20.0);
-  private static Supplier<Temperature> generate0to20DegreeTemperature = () -> generateSpecificTemperature.apply(Math.random()*20);
+  private final int MEAN_WINDOW_SIZE = 10;
+  //warning: nanoTime() is used rather than currentTimeMillis() in order to ensure each generated record is unique
+  private static Function<Double,TemperatureMeasurement> generateSpecificTemperature = x -> new TemperatureMeasurement(System.nanoTime(), x,"therm_1");
+  private static Supplier<TemperatureMeasurement> generateTwentyDegreeTemperature = () -> generateSpecificTemperature.apply(20.0);
+  private static Supplier<TemperatureMeasurement> generateRandomTemperature = () -> generateSpecificTemperature.apply(Math.random());
 
-  @Mock
-  private TemperatureRepository temperatureRepository;
-  @InjectMocks
   private TimeAgnosticAlgorithm timeAgnosticAlgorithm;
 
   @Before
   public void init() {
-    MockitoAnnotations.initMocks(this);
-    timeAgnosticAlgorithm = new TimeAgnosticAlgorithm(TEST_WINDOW_SIZE);
-    when(defaultThermometer.getId()).thenReturn(1L);
-    MockitoAnnotations.openMocks(this);
+    timeAgnosticAlgorithm = new TimeAgnosticAlgorithm(MEAN_WINDOW_SIZE);
+  }
+
+
+  @Test
+  public void testTooFewElements() {
+    List<TemperatureMeasurement> measurements = Collections.nCopies(MEAN_WINDOW_SIZE - 1,
+        new TemperatureMeasurement(1000l, 20.0, "therm_1"));
+    Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(measurements);
+    assertTrue(anomalies.isEmpty());
+  }
+  @Test
+  public void testEmptyList() {
+    Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(Collections.emptyList());
+    assertTrue(anomalies.isEmpty());
   }
 
   @Test
-  public void testSetup() {
-    assert (timeAgnosticAlgorithm != null);
-    assert (temperatureRepository != null);
+  public void testNoAnomalies() {
+    List<TemperatureMeasurement> tenAnomalies= Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE).collect(
+        Collectors.toList());
+    Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(tenAnomalies);
+
+    assertTrue(anomalies.isEmpty());
   }
 
   @Test
-  public void test0Anomalies() {
-    when(temperatureRepository.getXPreviousTemperatures(anyInt(), anyLong(), anyLong())).thenReturn(
-        Stream.generate(generateTwentyDegreeTemperature).limit(TEST_WINDOW_SIZE).collect(
-            Collectors.toList()));
-    Temperature newTemperature = generateTwentyDegreeTemperature.get();
+  public void test1Anomaly() {
+    List<TemperatureMeasurement> measurements = Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE).collect(
+        Collectors.toList());
+    TemperatureMeasurement anomaly = new TemperatureMeasurement(1000l, measurements.get(0)
+        .temperature() + OUTLIER_THRESHOLD_TEMPERATURE*2, "therm_1");
 
-    assert(timeAgnosticAlgorithm.findNewAnomaliesForNewTemperature(newTemperature).isEmpty());
+    measurements.set(MEAN_WINDOW_SIZE-1, anomaly);
+
+    Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(measurements);
+    assertTrue(anomalies.size() == 1);
   }
+
 
   @Test
-  public void test1Anomalies() {
+  public void testManyAnomalies() throws InterruptedException {
+    List<TemperatureMeasurement> measurements = Stream.generate(generateTwentyDegreeTemperature).limit(MEAN_WINDOW_SIZE*5).collect(
+        Collectors.toList());
+    Double outlierTemperature= 20.0  + OUTLIER_THRESHOLD_TEMPERATURE*2;
+    measurements.set(MEAN_WINDOW_SIZE -1, generateSpecificTemperature.apply(outlierTemperature));
+    measurements.set(MEAN_WINDOW_SIZE*2 -1, generateSpecificTemperature.apply(outlierTemperature));
+    measurements.set(MEAN_WINDOW_SIZE*3 -1, generateSpecificTemperature.apply(outlierTemperature));
+    measurements.set(MEAN_WINDOW_SIZE*4 -1, generateSpecificTemperature.apply(outlierTemperature));
+    measurements.set(MEAN_WINDOW_SIZE*5 -1, generateSpecificTemperature.apply(outlierTemperature));
 
-    List<Temperature> temperatures =  Stream.generate(generateTwentyDegreeTemperature).limit(TEST_WINDOW_SIZE).collect(Collectors.toList());
-    temperatures.add(generateSpecificTemperature.apply(20.0 * 3));
-
-    when(temperatureRepository.getXPreviousTemperatures(anyInt(), anyLong(), anyLong())).thenReturn(temperatures);
-    Temperature newTemperature = generateTwentyDegreeTemperature.get();
-
-    assert(timeAgnosticAlgorithm.findNewAnomaliesForNewTemperature(newTemperature).size() == 1);
+    Set<TemperatureMeasurement> anomalies = timeAgnosticAlgorithm.findAllAnomalies(measurements);
+    assertTrue(anomalies.size() == 5);
   }
 
-  @Test
-  public void testManyAnomalies() {
-
-    List<Temperature> temperatures =
-        Stream.generate(generate0to20DegreeTemperature).limit(TEST_WINDOW_SIZE*50).collect(Collectors.toList());
-
-    when(temperatureRepository.getXPreviousTemperatures(anyInt(), anyLong(), anyLong())).thenReturn(temperatures);
-    Temperature newTemperature = generateTwentyDegreeTemperature.get();
-
-    assert(timeAgnosticAlgorithm.findNewAnomaliesForNewTemperature(newTemperature).size() >= 1);
-  }
 
 
 }

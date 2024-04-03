@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 import org.temperature.model.TemperatureMeasurement;
 
+@Deprecated
 public class TestTimeSensitiveAlgorithm {
 
   private final static Function<Double,TemperatureMeasurement> generateSpecificTemperature
