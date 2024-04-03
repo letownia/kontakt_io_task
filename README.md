@@ -1,5 +1,14 @@
 ## kontakt_io_task
 
+This project is an implementation of a recruitment task for kontakt io.
+
+It is made of a couple of components  : 
+- mock thermometers (see producer/ ) that send mock temperatures to a kafka stream
+- kafka network
+- postgres DB for storing temperatures and anomalies
+- a temperature collector (see collector/) that collects temperatures, saves them to db, analyzes them for anomalies, and publishes info on anomalies
+
+At the time of writing, it is still a work in progress.
 
 # Zookeeper
 
