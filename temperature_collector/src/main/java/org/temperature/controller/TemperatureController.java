@@ -1,15 +1,19 @@
 package org.temperature.controller;
 
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.temperature.config.KafkaConfig;
 import org.temperature.model.AnomalyType;
 import org.temperature.model.TemperatureMeasurement;
 import org.temperature.model.db.Room;
@@ -34,6 +38,8 @@ public class TemperatureController {
 
   @Autowired
   private RoomRepository roomRepository;
+
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
   @GetMapping("/")

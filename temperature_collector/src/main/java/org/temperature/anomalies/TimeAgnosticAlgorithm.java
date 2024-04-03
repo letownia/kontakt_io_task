@@ -21,6 +21,10 @@ public class TimeAgnosticAlgorithm implements AnomalyDetectionAlgorithm {
   static final double OUTLIER_THRESHOLD_TEMPERATURE = 5.0;
 
   private final int windowSize;
+
+  public TimeAgnosticAlgorithm() {
+    this(10);
+  }
   public TimeAgnosticAlgorithm(int windowSize) {
     this.windowSize = windowSize;
   }
